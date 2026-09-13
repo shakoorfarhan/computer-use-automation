@@ -1,4 +1,4 @@
-import { chromium, type Browser, type BrowserContext, type BrowserServer, type Page } from "playwright";
+import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { snapshotAccessibleText } from "./a11y.js";
 
 export interface Observation {
@@ -11,25 +11,31 @@ export interface ToolActionError {
   message: string;
 }
 
+// Fixed local CDP port for the escalation demo. Playwright's own connect()
+// protocol does NOT expose one client's contexts to a second independent
+// client; only raw CDP (chromium.connectOverCDP) reflects the real, shared
+// browser target list, which is what a genuine operator handoff needs.
+const CDP_PORT = 9333;
+
 export class BrowserDriver {
-  private server?: BrowserServer;
   private browser?: Browser;
   private context?: BrowserContext;
   private page?: Page;
+  private cdpEndpoint?: string;
 
-  // Launched via launchServer/connect (rather than a plain launch()) so the
-  // resulting wsEndpoint can be handed to a separate operator process during
-  // escalation — the same live session, not a fresh browser.
   async launch(headless: boolean): Promise<void> {
-    this.server = await chromium.launchServer({ headless });
-    this.browser = await chromium.connect(this.server.wsEndpoint());
+    this.cdpEndpoint = `http://127.0.0.1:${CDP_PORT}`;
+    this.browser = await chromium.launch({
+      headless,
+      args: [`--remote-debugging-port=${CDP_PORT}`],
+    });
     this.context = await this.browser.newContext();
     this.page = await this.context.newPage();
   }
 
   getWsEndpoint(): string {
-    if (!this.server) throw new Error("BrowserDriver not launched");
-    return this.server.wsEndpoint();
+    if (!this.cdpEndpoint) throw new Error("BrowserDriver not launched");
+    return this.cdpEndpoint;
   }
 
   getPage(): Page {
@@ -89,11 +95,10 @@ export class BrowserDriver {
   }
 
   // Terminates the whole browser process. Skip this while an escalation
-  // ticket is outstanding — the operator's separate connection needs the
-  // server to stay alive.
+  // ticket is outstanding — the operator's separate CDP connection needs the
+  // browser to stay alive.
   async close(): Promise<void> {
     await this.context?.close();
     await this.browser?.close();
-    await this.server?.close();
   }
 }

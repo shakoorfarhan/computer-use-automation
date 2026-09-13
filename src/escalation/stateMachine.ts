@@ -2,8 +2,10 @@ import type { EscalationTicket } from "./ticket.js";
 
 // RUNNING (implicit, pre-ticket) -> AWAITING_HUMAN -> IN_PROGRESS -> RESUMED
 // An operator must claim before acting, and only a claimed ticket can resume.
+// Claiming an already-IN_PROGRESS ticket is allowed: an operator reconnecting
+// after a dropped session picks up where they left off, not a fresh claim.
 export function claim(ticket: EscalationTicket): EscalationTicket {
-  if (ticket.status !== "AWAITING_HUMAN") {
+  if (ticket.status !== "AWAITING_HUMAN" && ticket.status !== "IN_PROGRESS") {
     throw new Error(`Cannot claim a ticket in status ${ticket.status}.`);
   }
   return { ...ticket, status: "IN_PROGRESS", controlledBy: "operator" };

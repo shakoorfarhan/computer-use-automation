@@ -147,8 +147,16 @@ export function compileCapability(input: CompileInput): Capability {
     inputSchema[p.name] = { type: p.type, description: p.description, optional: false };
   }
 
+  // Only fields backed by an actual `extract` step belong in the enforced
+  // output contract. The model can echo other values into finish_goal's
+  // outputs for its own summary, but nothing without a matching outputRef is
+  // deterministically replayable, so it's dropped here rather than promised.
+  const extractedKeys = new Set(
+    compiledSteps.map((s) => s.outputRef).filter((ref): ref is string => Boolean(ref))
+  );
   const outputSchema: Record<string, FieldSpec> = {};
   for (const [key, value] of Object.entries(input.outputs)) {
+    if (!extractedKeys.has(key)) continue;
     outputSchema[key] = { type: inferFieldType(value), optional: false };
   }
 
