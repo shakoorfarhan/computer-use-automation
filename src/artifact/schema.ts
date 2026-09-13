@@ -36,14 +36,16 @@ export const ActionType = z.enum([
   "wait_for",
   "read_text",
   "press_key",
+  "login",
 ]);
 export type ActionType = z.infer<typeof ActionType>;
 
+// `value` may contain `{{paramName}}` placeholders, rendered against the
+// caller's input params at replay time (see replay/renderTemplate.ts).
 export const Action = z.object({
   type: ActionType,
   locator: Locator.optional(),
   value: z.string().optional(),
-  paramRef: z.string().optional(),
 });
 export type Action = z.infer<typeof Action>;
 
