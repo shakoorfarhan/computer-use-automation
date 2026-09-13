@@ -1,0 +1,17 @@
+<%- include("partials/head", { title: "Fault Injection Admin" }) %>
+<p><a href="/">&laquo; Back to dashboard</a></p>
+<fieldset>
+<legend>Fault Injection (test utility, not part of the teller UI)</legend>
+<p>Current global fault: <strong><%= current %></strong></p>
+<form method="post" action="/admin/faults">
+  <label for="mode">Fault mode</label>
+  <select id="mode" name="mode">
+    <% modes.forEach(function(m) { %>
+    <option value="<%= m %>" <%= m === current ? "selected" : "" %>><%= m %></option>
+    <% }) %>
+  </select>
+  <button type="submit">Apply</button>
+</form>
+<p>Or override per request with a query string, e.g. <code>?inject=not_found</code>.</p>
+</fieldset>
+<%- include("partials/foot") %>

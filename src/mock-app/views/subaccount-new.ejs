@@ -1,0 +1,11 @@
+<%- include("partials/head", { title: "New Sub-Account" }) %>
+<p><a href="/members/<%= member.id %>">&laquo; Back to member <%= member.id %></a></p>
+<fieldset>
+<legend>Open Sub-Account for Member <%= member.id %> (<%= member.name %>)</legend>
+<form method="post" action="/members/<%= member.id %>/subaccounts">
+  <label for="name">Sub-account name</label>
+  <input type="text" id="name" name="name" placeholder="e.g. Vacation Fund">
+  <button type="submit">Open Sub-Account</button>
+</form>
+</fieldset>
+<%- include("partials/foot") %>

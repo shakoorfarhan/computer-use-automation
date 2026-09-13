@@ -1,0 +1,22 @@
+<%- include("partials/head", { title: "Search Results" }) %>
+<p><a href="/">&laquo; Back to dashboard</a></p>
+<table class="data">
+<caption>Search results for "<%= query %>"</caption>
+<thead>
+<tr><th scope="col">Member ID</th><th scope="col">Name</th><th scope="col">Status</th><th scope="col">Action</th></tr>
+</thead>
+<tbody>
+<% if (results.length === 0) { %>
+<tr><td colspan="4">No members matched your search.</td></tr>
+<% } %>
+<% results.forEach(function(m) { %>
+<tr>
+  <td><%= m.id %></td>
+  <td><%= m.name %></td>
+  <td><%= m.status %></td>
+  <td><a href="/members/<%= m.id %>">View member <%= m.id %></a></td>
+</tr>
+<% }) %>
+</tbody>
+</table>
+<%- include("partials/foot") %>

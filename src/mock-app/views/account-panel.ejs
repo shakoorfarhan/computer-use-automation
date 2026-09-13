@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Account Panel</title>
+<style>
+  body { font-family: "Times New Roman", Times, serif; font-size: 13px; margin: 4px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #999; padding: 3px 6px; text-align: left; }
+</style>
+</head>
+<body>
+<table>
+<caption>Member <%= member.id %> account snapshot</caption>
+<tbody>
+<tr><th scope="row">Primary contact</th><td><%= member.name %></td></tr>
+<tr><th scope="row">Standing</th><td><%= member.status %></td></tr>
+<tr><th scope="row">Sub-accounts on file</th><td><%= member.subAccounts.length %></td></tr>
+</tbody>
+</table>
+</body>
+</html>

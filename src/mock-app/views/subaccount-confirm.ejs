@@ -1,0 +1,13 @@
+<%- include("partials/head", { title: "Sub-Account Confirmation" }) %>
+<div class="notice-box" role="status">Sub-account opened successfully.</div>
+<table class="data">
+<caption>Confirmation</caption>
+<tbody>
+<tr class="field-row"><th scope="row">Member</th><td><%= member.id %> &mdash; <%= member.name %></td></tr>
+<tr class="field-row"><th scope="row">New sub-account ID</th><td><%= subAccount.id %></td></tr>
+<tr class="field-row"><th scope="row">Name</th><td><%= subAccount.name %></td></tr>
+<tr class="field-row"><th scope="row">Opening balance</th><td>$<%= subAccount.balance.toFixed(2) %></td></tr>
+</tbody>
+</table>
+<p><a href="/members/<%= member.id %>">Return to member <%= member.id %></a></p>
+<%- include("partials/foot") %>

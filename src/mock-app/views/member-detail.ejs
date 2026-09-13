@@ -1,0 +1,42 @@
+<%- include("partials/head", { title: "Member " + member.id }) %>
+<p><a href="/">&laquo; Back to dashboard</a></p>
+<table class="data">
+<caption>Member <%= member.id %> &mdash; <%= member.name %></caption>
+<tbody>
+<tr class="field-row"><th scope="row">Status</th><td><%= member.status %></td></tr>
+</tbody>
+</table>
+
+<table class="data">
+<caption>Accounts</caption>
+<thead>
+<tr><th scope="col">Account</th><th scope="col">Number</th><th scope="col">Balance</th></tr>
+</thead>
+<tbody>
+<tr><td>Savings</td><td><%= member.savings.number %></td><td>$<%= member.savings.balance.toFixed(2) %></td></tr>
+<tr><td>Checking</td><td><%= member.checking.number %></td><td>$<%= member.checking.balance.toFixed(2) %></td></tr>
+</tbody>
+</table>
+
+<table class="data">
+<caption>Sub-Accounts</caption>
+<thead>
+<tr><th scope="col">Name</th><th scope="col">Balance</th></tr>
+</thead>
+<tbody>
+<% if (member.subAccounts.length === 0) { %>
+<tr><td colspan="2">No sub-accounts on file.</td></tr>
+<% } %>
+<% member.subAccounts.forEach(function(sa) { %>
+<tr><td><%= sa.name %></td><td>$<%= sa.balance.toFixed(2) %></td></tr>
+<% }) %>
+</tbody>
+</table>
+
+<p><a href="/members/<%= member.id %>/subaccounts/new">Open a new sub-account for member <%= member.id %></a></p>
+
+<fieldset>
+<legend>Account Detail Panel</legend>
+<iframe title="Account detail panel" src="/members/<%= member.id %>/panel" width="100%" height="160" style="border: 1px solid #999;"></iframe>
+</fieldset>
+<%- include("partials/foot") %>

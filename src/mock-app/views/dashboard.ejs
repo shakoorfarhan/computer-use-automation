@@ -1,0 +1,11 @@
+<%- include("partials/head", { title: "Dashboard" }) %>
+<p>Signed in as <strong><%= tellerId %></strong> &middot; <a href="/logout">Sign out</a></p>
+<fieldset>
+<legend>Member Lookup</legend>
+<form method="get" action="/members/search">
+  <label for="q">Member ID or name</label>
+  <input type="text" id="q" name="q">
+  <button type="submit">Search</button>
+</form>
+</fieldset>
+<%- include("partials/foot") %>
