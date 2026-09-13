@@ -9,6 +9,7 @@
     "mock-app": "tsx src/mock-app/server.ts",
     "discover": "tsx src/discovery/run.ts",
     "replay": "tsx src/replay/run.ts",
+    "operator": "tsx src/escalation/operatorCli.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
