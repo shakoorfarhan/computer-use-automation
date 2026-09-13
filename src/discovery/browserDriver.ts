@@ -1,4 +1,4 @@
-import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
+import { chromium, type Browser, type BrowserContext, type BrowserServer, type Page } from "playwright";
 import { snapshotAccessibleText } from "./a11y.js";
 
 export interface Observation {
@@ -12,14 +12,24 @@ export interface ToolActionError {
 }
 
 export class BrowserDriver {
+  private server?: BrowserServer;
   private browser?: Browser;
   private context?: BrowserContext;
   private page?: Page;
 
+  // Launched via launchServer/connect (rather than a plain launch()) so the
+  // resulting wsEndpoint can be handed to a separate operator process during
+  // escalation — the same live session, not a fresh browser.
   async launch(headless: boolean): Promise<void> {
-    this.browser = await chromium.launch({ headless });
+    this.server = await chromium.launchServer({ headless });
+    this.browser = await chromium.connect(this.server.wsEndpoint());
     this.context = await this.browser.newContext();
     this.page = await this.context.newPage();
+  }
+
+  getWsEndpoint(): string {
+    if (!this.server) throw new Error("BrowserDriver not launched");
+    return this.server.wsEndpoint();
   }
 
   getPage(): Page {
@@ -78,8 +88,12 @@ export class BrowserDriver {
     await this.getPage().screenshot({ path, fullPage: true }).catch(() => {});
   }
 
+  // Terminates the whole browser process. Skip this while an escalation
+  // ticket is outstanding — the operator's separate connection needs the
+  // server to stay alive.
   async close(): Promise<void> {
     await this.context?.close();
     await this.browser?.close();
+    await this.server?.close();
   }
 }

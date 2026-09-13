@@ -3,6 +3,8 @@ import { checkAllowlist, type AllowlistConfig } from "../guardrails/allowlist.js
 import { classifyIntent, evaluateRiskGate } from "../guardrails/riskClassifier.js";
 import type { ActionType, RiskLevel } from "../artifact/schema.js";
 import { readRowValue } from "../replay/rowExtraction.js";
+import { waitForResume } from "../escalation/wait.js";
+import { writeTicket, type EscalationTicket } from "../escalation/ticket.js";
 import { BrowserDriver, type Observation } from "./browserDriver.js";
 import { DISCOVERY_TOOLS } from "./tools.js";
 import { TranscriptLogger } from "./transcript.js";
@@ -21,6 +23,8 @@ export interface DiscoveryConfig {
   tellerPassword: string;
   evidenceDir: string;
   transcript: TranscriptLogger;
+  escalationTicketPath: string;
+  maxEscalationWaitMs: number;
 }
 
 export interface RecordedStep {
@@ -32,7 +36,12 @@ export interface RecordedStep {
   observationAfter: Observation;
 }
 
-export type DiscoveryStatus = "completed" | "stuck" | "max_steps" | "timeout";
+export type DiscoveryStatus =
+  | "completed"
+  | "completed_via_escalation"
+  | "stuck"
+  | "max_steps"
+  | "timeout";
 
 export interface DiscoveryResult {
   status: DiscoveryStatus;
@@ -158,7 +167,55 @@ export async function runDiscovery(config: DiscoveryConfig): Promise<DiscoveryRe
           action: { type: "report_stuck", params: input },
           outcome: "ok",
         });
-        return { status: "stuck", steps, extracted, reason };
+
+        const ticket: EscalationTicket = {
+          id: `esc-${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          goal: config.goal,
+          currentStepDescription: `Step ${stepNumber}: ${observation.title} (${observation.url})`,
+          reason,
+          screenshotPath: `${config.evidenceDir}/stop-stuck.png`,
+          wsEndpoint: driver.getWsEndpoint(),
+          targetUrl: observation.url,
+          status: "AWAITING_HUMAN",
+          controlledBy: "system",
+          operatorActions: [],
+        };
+        writeTicket(config.escalationTicketPath, ticket);
+        config.transcript.log({
+          step: stepNumber,
+          timestamp: new Date().toISOString(),
+          outcome: "blocked",
+          detail: `Escalation raised: ${config.escalationTicketPath}`,
+        });
+        console.log(`\n[ESCALATION] Automation is stuck: ${reason}`);
+        console.log(`[ESCALATION] Ticket written to ${config.escalationTicketPath}`);
+        console.log(
+          `[ESCALATION] In another terminal, run: npm run operator -- --ticket ${config.escalationTicketPath}\n`
+        );
+
+        const finalTicket = await waitForResume(config.escalationTicketPath, config.maxEscalationWaitMs);
+        if (finalTicket.status === "RESUMED") {
+          config.transcript.log({
+            step: stepNumber,
+            timestamp: new Date().toISOString(),
+            outcome: "ok",
+            detail: `Operator resumed control. Actions: ${JSON.stringify(finalTicket.operatorActions)}`,
+          });
+          return {
+            status: "completed_via_escalation",
+            steps,
+            extracted,
+            outputs: finalTicket.resumeOutputs ?? {},
+            summary: finalTicket.resumeSummary ?? "Completed via human intervention.",
+          };
+        }
+        return {
+          status: "stuck",
+          steps,
+          extracted,
+          reason: `${reason} (escalation not resumed within timeout)`,
+        };
       }
 
       const riskLevel = classifyIntent(intent || toolUse.name);
