@@ -1,0 +1,12 @@
+{
+  "runId": "escalation-demo",
+  "goal": "Open a new sub-account named 'Vacation Fund 2' for member 10023 and reach the confirmation screen",
+  "status": "completed_via_escalation",
+  "summary": "Manually opened the sub-account and reached the confirmation screen.",
+  "outputs": {
+    "subAccountId": "**-*****-1000",
+    "subAccountName": "Vacation Fund 2",
+    "openingBalance": "$0.00"
+  },
+  "stepCount": 6
+}

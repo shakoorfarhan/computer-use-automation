@@ -1,0 +1,5 @@
+{
+  "kind": "business_outcome",
+  "signature": "heading:Member Not Found",
+  "description": "No member record exists for the given ID — a legitimate lookup result, not a system fault."
+}

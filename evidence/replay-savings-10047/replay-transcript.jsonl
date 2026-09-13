@@ -1,0 +1,5 @@
+{"step":1,"timestamp":"2026-09-13T18:24:34.604Z","action":{"type":"login","params":{}},"observation":{"url":"http://localhost:4000/","title":"Dashboard - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":2,"timestamp":"2026-09-13T18:24:36.627Z","action":{"type":"fill","params":{}},"observation":{"url":"http://localhost:4000/","title":"Dashboard - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":3,"timestamp":"2026-09-13T18:24:38.696Z","action":{"type":"click","params":{}},"observation":{"url":"http://localhost:4000/members/search?q=10047","title":"Search Results - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":4,"timestamp":"2026-09-13T18:24:40.714Z","action":{"type":"goto","params":{}},"observation":{"url":"http://localhost:4000/members/10047","title":"Member 10047 - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":5,"timestamp":"2026-09-13T18:24:42.725Z","action":{"type":"read_text","params":{}},"observation":{"url":"http://localhost:4000/members/10047","title":"Member 10047 - Meridian Credit Union Teller Console"},"outcome":"ok"}

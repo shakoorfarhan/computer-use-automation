@@ -1,0 +1,160 @@
+{
+  "id": "lookup-member-savings",
+  "name": "Look up member savings balance",
+  "version": "1.0.0",
+  "description": "Signs in as the teller, opens member 10023's record, and reads the savings balance.",
+  "target": {
+    "app": "teller-console",
+    "entryUrl": "http://localhost:4000/login",
+    "allowedDomains": [
+      "localhost"
+    ]
+  },
+  "inputSchema": {
+    "memberId": {
+      "type": "string",
+      "optional": false
+    }
+  },
+  "outputSchema": {
+    "savingsBalance": {
+      "type": "string",
+      "optional": false
+    }
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "intent": "login",
+      "action": {
+        "type": "login"
+      },
+      "riskLevel": "reversible",
+      "checkpoint": {
+        "type": "url_matches",
+        "expect": "http://localhost:4000/"
+      }
+    },
+    {
+      "id": "step-2",
+      "intent": "Enter member ID to search",
+      "action": {
+        "type": "fill",
+        "locator": {
+          "primary": {
+            "strategy": "role_and_name",
+            "value": "textbox:Member ID or name",
+            "confidence": "high",
+            "rationale": "Accessible role+name stays stable in server-rendered legacy markup even without test IDs; this app exposes \"Member ID or name\" as the accessible name of a textbox."
+          },
+          "fallbacks": [
+            {
+              "strategy": "text_content",
+              "value": "Member ID or name",
+              "confidence": "medium",
+              "rationale": "Falls back to visible text if the role changes but the label persists."
+            }
+          ]
+        },
+        "value": "{{memberId}}"
+      },
+      "riskLevel": "safe"
+    },
+    {
+      "id": "step-3",
+      "intent": "Search for member 10023",
+      "action": {
+        "type": "click",
+        "locator": {
+          "primary": {
+            "strategy": "role_and_name",
+            "value": "button:Search",
+            "confidence": "high",
+            "rationale": "Accessible role+name stays stable in server-rendered legacy markup even without test IDs; this app exposes \"Search\" as the accessible name of a button."
+          },
+          "fallbacks": [
+            {
+              "strategy": "text_content",
+              "value": "Search",
+              "confidence": "medium",
+              "rationale": "Falls back to visible text if the role changes but the label persists."
+            }
+          ]
+        }
+      },
+      "riskLevel": "safe",
+      "checkpoint": {
+        "type": "url_matches",
+        "expect": "http://localhost:4000/members/search?q={{memberId}}"
+      }
+    },
+    {
+      "id": "step-4",
+      "intent": "Navigate directly to member 10023 detail page",
+      "action": {
+        "type": "goto",
+        "value": "http://localhost:4000/members/{{memberId}}"
+      },
+      "riskLevel": "safe",
+      "checkpoint": {
+        "type": "url_matches",
+        "expect": "http://localhost:4000/members/{{memberId}}"
+      }
+    },
+    {
+      "id": "step-5",
+      "intent": "Extract savings balance for member 10023",
+      "action": {
+        "type": "read_text",
+        "locator": {
+          "primary": {
+            "strategy": "text_content",
+            "value": "{\"rowLabel\":\"Savings\",\"cellIndex\":\"last\"}",
+            "confidence": "high",
+            "rationale": "Anchored to a stable row-label cell rather than the dynamic value itself, so the locator survives across different member records."
+          },
+          "fallbacks": []
+        }
+      },
+      "riskLevel": "reversible",
+      "outputRef": "savingsBalance"
+    }
+  ],
+  "successCondition": {
+    "type": "url_matches",
+    "expect": "http://localhost:4000/members/{{memberId}}"
+  },
+  "errorTaxonomy": [
+    {
+      "signature": "heading:Member Not Found",
+      "classification": "business_outcome",
+      "description": "No member record exists for the given ID — a legitimate lookup result, not a system fault."
+    },
+    {
+      "signature": "heading:Permission Denied",
+      "classification": "business_outcome",
+      "description": "The teller's role is not authorized for this record — a legitimate access-control result."
+    },
+    {
+      "signature": "redirect:session_expired",
+      "classification": "recoverable",
+      "description": "The session expired mid-flow; replay re-authenticates once and retries the remaining steps."
+    },
+    {
+      "signature": "heading:Internal Error",
+      "classification": "hard_failure",
+      "description": "The backend returned an unexpected server error; stop and surface for debugging."
+    },
+    {
+      "signature": "timeout",
+      "classification": "recoverable",
+      "description": "A page load or element wait exceeded the normal timeout; retried once with an extended timeout before failing hard."
+    }
+  ],
+  "provenance": {
+    "discoveryRunId": "discovery-1789323736180",
+    "model": "claude-sonnet-5",
+    "promptHash": "n/a",
+    "createdAt": "2026-09-13T18:24:18.610Z"
+  }
+}

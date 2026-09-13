@@ -1,0 +1,4 @@
+{"step":1,"timestamp":"2026-09-13T18:25:05.345Z","action":{"type":"login","params":{}},"observation":{"url":"http://localhost:4000/","title":"Dashboard - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":2,"timestamp":"2026-09-13T18:25:07.356Z","action":{"type":"fill","params":{}},"observation":{"url":"http://localhost:4000/","title":"Dashboard - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":3,"timestamp":"2026-09-13T18:25:09.420Z","action":{"type":"click","params":{}},"observation":{"url":"http://localhost:4000/members/search?q=10023","title":"Search Results - Meridian Credit Union Teller Console"},"outcome":"ok"}
+{"step":4,"timestamp":"2026-09-13T18:25:09.482Z","outcome":"ok","detail":"Detected fault signature \"heading:Member Not Found\" classified as business_outcome."}

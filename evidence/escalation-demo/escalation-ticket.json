@@ -1,0 +1,51 @@
+{
+  "id": "esc-1789324284880",
+  "createdAt": "2026-09-13T18:31:24.880Z",
+  "goal": "Open a new sub-account named 'Vacation Fund 2' for member 10023 and reach the confirmation screen",
+  "currentStepDescription": "Step 11: Search Results - Meridian Credit Union Teller Console (http://localhost:4000/members/search?q=10023)",
+  "reason": "Attempting to open member 10023's profile (link \"View member 10023\" at /members/10023) is being refused by the system with \"Action blocked by policy: Irreversible action during discovery requires explicit confirmation.\" This occurs consistently whether clicking the link or navigating directly to the URL, across multiple attempts and even after returning to the dashboard and re-searching. There is no visible confirmation control in the accessibility tree to satisfy this policy requirement, so I cannot proceed to the member profile (a required step before opening a new sub-account) without risking an unauthorized/irreversible action. Human judgment or an explicit confirmation mechanism is needed to continue.",
+  "screenshotPath": "evidence/escalation-demo/stop-stuck.png",
+  "wsEndpoint": "http://127.0.0.1:9333",
+  "targetUrl": "http://localhost:4000/members/search?q=10023",
+  "status": "RESUMED",
+  "controlledBy": "system",
+  "operatorActions": [
+    {
+      "timestamp": "2026-09-13T18:32:58.320Z",
+      "command": "click link \"View member 10023\""
+    },
+    {
+      "timestamp": "2026-09-13T18:36:17.288Z",
+      "command": "click link \"Open a new sub-account for member 10023\""
+    },
+    {
+      "timestamp": "2026-09-13T18:36:17.300Z",
+      "command": "fill textbox \"Sub-account name\" \"Vacation Fund 2\""
+    },
+    {
+      "timestamp": "2026-09-13T18:36:17.342Z",
+      "command": "click button \"Open Sub-Account\""
+    },
+    {
+      "timestamp": "2026-09-13T18:36:17.354Z",
+      "command": "extract \"New sub-account ID\" subAccountId",
+      "detail": "extracted subAccountId=SA-10023-1000"
+    },
+    {
+      "timestamp": "2026-09-13T18:36:17.356Z",
+      "command": "extract \"Name\" subAccountName",
+      "detail": "extracted subAccountName=Vacation Fund 2"
+    },
+    {
+      "timestamp": "2026-09-13T18:36:17.357Z",
+      "command": "extract \"Opening balance\" openingBalance",
+      "detail": "extracted openingBalance=$0.00"
+    }
+  ],
+  "resumeOutputs": {
+    "subAccountId": "SA-10023-1000",
+    "subAccountName": "Vacation Fund 2",
+    "openingBalance": "$0.00"
+  },
+  "resumeSummary": "Manually opened the sub-account and reached the confirmation screen."
+}

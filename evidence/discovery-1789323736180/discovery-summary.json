@@ -1,0 +1,12 @@
+{
+  "runId": "discovery-1789323736180",
+  "goal": "Log in, look up member 10023, and read their current savings balance",
+  "status": "completed",
+  "summary": "Logged in, looked up member 10023 (Alice Nakamura), and read their current savings balance.",
+  "outputs": {
+    "memberId": "10023",
+    "memberName": "Alice Nakamura",
+    "savingsBalance": "$4820.55"
+  },
+  "stepCount": 5
+}
